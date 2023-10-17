@@ -25,7 +25,7 @@ public class AlbumTests : IClassFixture<DatabaseFixture>
                 new Address("Photo Street", "1234", "Photoville", "Photanien"),
                 new PhoneNumber(43, 1234, "123456789"),
                 new PhoneNumber(43, 1234, "123456789"),
-                new EMail("schrutek@spengergasse.at"),
+                new List<EMail>() { new EMail("schrutek@spengergasse.at"), new EMail("schrutek2@spengergasse.at") },
                 new EMail("schrutek@spengergasse.at")
             );
             Album newAlbum1 = new Album(

@@ -8,6 +8,6 @@ namespace Spg.AloMalo.DomainModel.Model
 {
     public record EMail(string Address)
     {
-        //public int AlbumId { get; set; } // VO hat niemals PK
+        //public int Id { get; set; } // VO hat niemals PK
     }
 }

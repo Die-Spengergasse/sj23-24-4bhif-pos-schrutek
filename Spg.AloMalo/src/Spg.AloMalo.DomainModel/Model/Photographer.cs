@@ -20,10 +20,8 @@ namespace Spg.AloMalo.DomainModel.Model
         private List<Album> _albums = new();
         public IReadOnlyList<Album> Albums => _albums;
 
-        //private List<EMail> _eMails = new();
-        //public IReadOnlyList<EMail> EMails => _eMails;
-
-        public EMail EMail { get; set; } = default!;
+        private List<EMail> _eMails = new();
+        public IReadOnlyList<EMail> EMails => _eMails;
 
         protected Photographer()
         { }
@@ -33,14 +31,14 @@ namespace Spg.AloMalo.DomainModel.Model
             Address studioAddress,
             PhoneNumber mobilePhoneNumber,
             PhoneNumber businessPhoneNumber,
-            EMail eMail,
+            List<EMail> eMails,
             EMail username)
             :base(firstName, lastName, username)
         {
             StudioAddress = studioAddress;
             MobilePhoneNumber = mobilePhoneNumber;
             BusinessPhoneNumber = businessPhoneNumber;
-            EMail= eMail;
+            _eMails = eMails;
         }
     }
 }

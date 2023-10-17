@@ -14,7 +14,7 @@ namespace Spg.AloMalo.DomainModel.Test.Helpers
                     new Address("Photo Street 1", "1234", "Photoville", "Photanien"),
                     new PhoneNumber(43, 1234, "123456789"),
                     new PhoneNumber(43, 1234, "123456789"),
-                    new EMail("schrutek@spengergasse.at"),
+                    new List<EMail>() { new EMail("schrutek@spengergasse.at"), new EMail("schrutek2@spengergasse.at") },
                     new EMail("schrutek@spengergasse.at")
                 )
             };

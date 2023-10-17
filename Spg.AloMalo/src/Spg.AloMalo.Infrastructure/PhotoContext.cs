@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Spg.AloMalo.DomainModel.Model;
 using Spg.AloMalo.Infrastructure.IdConverters;
+using System.Reflection.Emit;
 
 namespace Spg.AloMalo.Infrastructure
 {
@@ -23,11 +24,20 @@ namespace Spg.AloMalo.Infrastructure
             builder.Entity<Photographer>().OwnsOne(e => e.StudioAddress);
             builder.Entity<Photographer>().OwnsOne(e => e.BusinessPhoneNumber);
             builder.Entity<Photographer>().OwnsOne(e => e.MobilePhoneNumber);
-            builder.Entity<Photographer>().OwnsOne(e => e.EMail);
             builder.Entity<Photographer>().OwnsOne(e => e.Username);
             builder.Entity<Person>().OwnsOne(e => e.Username);
             builder.Entity<Photo>().OwnsOne(e => e.Location);
 
+            // Photographer -> EMails
+            builder.Entity<Photographer>().OwnsMany(
+                p => p.EMails, a =>
+                {
+                    a.WithOwner().HasForeignKey("PhotographerId");
+                    a.Property<int>("Id");
+                    a.HasKey("Id");
+                });
+
+            // Rich Types
             builder.Entity<Album>()
                 .Property(p => p.Id)
                 .HasConversion(new AlbumIdValueConverter())
