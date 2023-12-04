@@ -1,32 +1,66 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Spg.AloMalo.DomainModel.Model;
 using Spg.AloMalo.Infrastructure.IdConverters;
+using System;
 using System.Reflection.Emit;
 
 namespace Spg.AloMalo.Infrastructure
 {
+    // Test-Containers-Example:
+    // https://github.com/testcontainers/testcontainers-dotnet/blob/develop/examples/WeatherForecast/src/WeatherForecast/DatabaseContainer.cs
+
+    // 1. Klasse vo DbContext ableiten (NuGet-Package EF Core installieren)
     public class PhotoContext : DbContext
     {
+        // 2. Sets festlegen (Aggregate Roots)
         public DbSet<Photo> Photos => Set<Photo>();
         public DbSet<Album> Albums => Set<Album>();
-        public DbSet<AlbumPhoto> AlbumPhotos => Set<AlbumPhoto>();
         public DbSet<Photographer> Photographers => Set<Photographer>();
         public DbSet<Person> Persons => Set<Person>();
 
+        // 3. Konstruktoren
+        public PhotoContext()
+        { }
         public PhotoContext(DbContextOptions options)
             : base(options)
         { }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder builder)
+        {
+            base.OnConfiguring(builder);
+
+            if (!builder.IsConfigured)
+            {
+                builder.UseSqlServer("Server=localhost\\sqlexpress;Database=PhotoDb;Integrated Security=true;MultipleActiveResultSets=True;Encrypt=False;");
+                //builder.UseSqlite("Data Source=C:\\HTL\\Unterricht\\SJ2324\\4BHIF\\POS\\sj23-24-4bhif-pos-schrutek\\Spg.AloMalo\\Photo.db");
+            }
+        }
+
+        // 4. Methoden ((OnConfiguring), OnModelCreating)
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
 
+            // Value Objects
             builder.Entity<Photographer>().OwnsOne(e => e.StudioAddress);
             builder.Entity<Photographer>().OwnsOne(e => e.BusinessPhoneNumber);
             builder.Entity<Photographer>().OwnsOne(e => e.MobilePhoneNumber);
             builder.Entity<Photographer>().OwnsOne(e => e.Username);
             builder.Entity<Person>().OwnsOne(e => e.Username);
             builder.Entity<Photo>().OwnsOne(e => e.Location);
+
+            // Nested Value Objects
+            // https://stackoverflow.com/questions/53652135/entity-framework-core-2-1-owned-types-and-nested-value-objects
+            builder.Entity<Photographer>(p =>
+            {
+                p.OwnsOne(e => e.StudioAddress, a =>
+                {
+                    a.OwnsOne(e => e.State, state =>
+                    {
+                        state.Property(e => e.Name).HasColumnName("StateName");
+                    });
+                });
+            });
 
             // Photographer -> EMails
             builder.Entity<Photographer>().OwnsMany(
@@ -38,6 +72,7 @@ namespace Spg.AloMalo.Infrastructure
                 });
 
             // Rich Types
+            // https://andrewlock.net/using-strongly-typed-entity-ids-to-avoid-primitive-obsession-part-3/
             builder.Entity<Album>()
                 .Property(p => p.Id)
                 .HasConversion(new AlbumIdValueConverter())
@@ -72,6 +107,17 @@ namespace Spg.AloMalo.Infrastructure
                 .HasColumnName("Id")
                 .ValueGeneratedOnAdd()
                 .IsRequired();
+
+
+            //var type = converter.ModelClrType;
+            //foreach (var entityType in builder.Model.GetEntityTypes())
+            //{
+            //    // Find the properties that are our strongly-typed ID
+            //    var properties = entityType
+            //        .ClrType
+            //        .GetProperties()
+            //        .Where(p => p.PropertyType == new PersonIdValueConverter());
+            //}
         }
     }
 }

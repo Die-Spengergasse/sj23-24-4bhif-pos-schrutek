@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,15 +9,15 @@ namespace Spg.AloMalo.DomainModel.Model
 {
     public class Photo
     {
-        public PhotoId Id { get; set; } = default!;
+        public PhotoId Id { get; private set; } = default!; // PK, auto increment
         public string Name{ get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public DateTime CreationTimeStamp { get; set; }
+        public DateTime CreationTimeStamp { get; private set; }
         public ImageTypes ImageType { get; private set; }
         public Location Location { get; set; } = default!;
-        public int Width { get; private set; }
-        public int Height { get; private set; }
-        public Orientations Orientation { get; private set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
+        public Orientations Orientation { get; set; }
         public bool AiGenerated { get; private set; }
 
         public Photographer? PhotographerNavigation { get; set; }
@@ -49,13 +50,29 @@ namespace Spg.AloMalo.DomainModel.Model
             AiGenerated = aiGenerated;
             PhotographerNavigation = photographer;
         }
-
-        public void AddAlbumPhoto(AlbumPhoto newItem)
+        public Photo AddAlbums(IEnumerable<Album> photos)
         {
-            if (newItem is not null)
+            _albumPhotos
+                .AddRange(photos?
+                    .Where(p => p is not null)
+                    .Select(p => new AlbumPhoto(p, this, 1))
+                        ?? new List<AlbumPhoto>());
+            return this;
+        }
+
+        public Photo AddAlbums(params Album[] photos)
+        {
+            AddAlbums(photos as IEnumerable<Album>);
+            return this;
+        }
+
+        public Photo AddAlbum(Album newAlbum)
+        {
+            if (newAlbum is not null)
             {
-                _albumPhotos.Add(newItem);
+                _albumPhotos.Add(new AlbumPhoto(newAlbum, this, 1));
             }
+            return this;
         }
     }
 }

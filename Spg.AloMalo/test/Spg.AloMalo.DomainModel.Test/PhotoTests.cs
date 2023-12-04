@@ -14,54 +14,70 @@ public class PhotoTests : IClassFixture<DatabaseFixture>
     }
 
     [Fact]
-    public void Photo_ShouldCreate_WhenEntitiesComplete()
+    public void Photo_ShouldInsertValidAlbums_WhenListNotNull()
     {
         using (PhotoContext db = _databaseFixture.Db)
         {
+
             // Arrange
-            Photographer newPhotographer = new(
-                "Martin",
-                "Schrutek",
-                new Address("Photo Street", "1234", "Photoville", "Photanien"),
-                new PhoneNumber(43, 1234, "123456789"),
-                new PhoneNumber(43, 1234, "123456789"),
-                new List<EMail>() { new EMail("schrutek@spengergasse.at"), new EMail("schrutek2@spengergasse.at") },
-                new EMail("schrutek@spengergasse.at")
-            );
-            Album newAlbum = new(
-                "Test Album 01", "Beschreibung...",
-                DateTime.Now,
-                true,
-                newPhotographer
-            );
-            Photo newPhoto = new(
+            Photographer newPhotographer = DatabaseUtilities.GetSeedingPhotographers()[0];
+            Photo newPhoto = new Photo(
                 "Test Photo 01",
                 "Beschreibung Test Photo 01...",
                 DateTime.Now,
                 ImageTypes.Png,
                 new Location(12, 17),
-                400,
-                800,
+                400, 800,
                 Orientations.Landscape,
                 false,
                 newPhotographer
-            );
-            AlbumPhoto newAlbumPhoto = new(
-                newAlbum,
-                newPhoto,
-                1);
-            newAlbum.AddAlbumPhoto(newAlbumPhoto);
-            newPhoto.AddAlbumPhoto(newAlbumPhoto);
+            ).AddAlbums(new Album(
+                "Test Album 01", "Beschreibung...",
+                DateTime.Now,
+                true,
+                newPhotographer
+            ));
 
             // Act
-            db.Albums.Add(newAlbum);
             db.Photos.Add(newPhoto);
             db.SaveChanges();
 
             // Assert
-            Assert.Single(db.Albums);
-            Assert.Single(db.Photos);
-            Assert.Single(db.AlbumPhotos);
+            Assert.Equal(1, db.Albums.Count());
+            Assert.Equal(1, db.Photos.Count());
+            Assert.Single(db.Albums.First().AlbumPhotos);
+        }
+    }
+
+    [Fact]
+    public void Photo_ShouldNotInsertValidAlbumss_WhenListIsNull()
+    {
+        using (PhotoContext db = _databaseFixture.Db)
+        {
+            // Arrange
+            Photographer newPhotographer = DatabaseUtilities.GetSeedingPhotographers()[0];
+            Photo newPhoto = new Photo(
+                "Test Photo 01",
+                "Beschreibung Test Photo 01...",
+                DateTime.Now,
+                ImageTypes.Png,
+                new Location(12, 17),
+                400, 800,
+                Orientations.Landscape,
+                false,
+                newPhotographer
+            ).AddAlbums(
+                null!
+            );
+
+            // Act
+            db.Photos.Add(newPhoto);
+            db.SaveChanges();
+
+            // Assert
+            Assert.Equal(1, db.Albums.Count());
+            Assert.Empty(db.Photos);
+            Assert.Empty(db.Albums.First().AlbumPhotos);
         }
     }
 }

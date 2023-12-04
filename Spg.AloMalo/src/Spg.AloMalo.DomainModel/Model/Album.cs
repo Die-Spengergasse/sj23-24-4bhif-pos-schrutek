@@ -37,12 +37,29 @@ namespace Spg.AloMalo.DomainModel.Model
             Owner = owner;
         }
 
-        public void AddAlbumPhoto(AlbumPhoto newItem)
+        public Album AddPhotos(IEnumerable<Photo> photos)
         {
-            if (newItem is not null)
+            _albumPhotos
+                .AddRange(photos?
+                    .Where(p => p is not null)
+                    .Select(p => new AlbumPhoto(this, p, 1)) 
+                        ?? new List<AlbumPhoto>());
+            return this;
+        }
+
+        public Album AddPhotos(params Photo [] photos)
+        {
+            AddPhotos(photos as IEnumerable<Photo>);
+            return this;
+        }
+
+        public Album AddPhoto(Photo newPhoto)
+        {
+            if (newPhoto is not null)
             {
-                _albumPhotos.Add(newItem);
+                _albumPhotos.Add(new AlbumPhoto(this, newPhoto, 1));
             }
+            return this;
         }
     }
 }

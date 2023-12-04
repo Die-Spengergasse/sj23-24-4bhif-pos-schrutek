@@ -9,9 +9,9 @@ namespace Spg.AloMalo.DomainModel.Model
     public class AlbumPhoto
     {
         public AlbumPhotoId Id { get; set; } = default!;
-        public int AlbumNavigationId { get; }
+        //public int AlbumNavigationId { get; }
         public Album AlbumNavigation { get; private set; } = default!;
-        public int PhotoNavigationId { get; }
+        //public int PhotoNavigationId { get; }
         public Photo PhotoNavigation { get; private set; } = default!;
         public int Position { get; set; }
 

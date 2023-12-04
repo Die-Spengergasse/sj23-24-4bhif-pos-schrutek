@@ -1,3 +1,5 @@
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 using Spg.AloMalo.DomainModel.Model;
 using Spg.AloMalo.DomainModel.Test.Helpers;
 using Spg.AloMalo.Infrastructure;
@@ -13,21 +15,27 @@ public class AlbumTests : IClassFixture<DatabaseFixture>
         _databaseFixture = databaseFixture;
     }
 
+    public PhotoContext CreateDb()
+    {
+        SqliteConnection connection = new SqliteConnection("Data Source=:memory:");
+        connection.Open();
+
+        DbContextOptions options = new DbContextOptionsBuilder()
+            .UseSqlite(connection)
+            .Options;
+
+        PhotoContext db = new PhotoContext(options);
+        db.Database.EnsureCreated();
+        return db;
+    }
+
     [Fact]
     public void Album_ShouldCreate_WhenEntitiesComplete()
     {
-        using (PhotoContext db = _databaseFixture.Db)
+        using (PhotoContext db = CreateDb())
         {
             // Arrange
-            Photographer newPhotographer = new Photographer(
-                "Martin",
-                "Schrutek",
-                new Address("Photo Street", "1234", "Photoville", "Photanien"),
-                new PhoneNumber(43, 1234, "123456789"),
-                new PhoneNumber(43, 1234, "123456789"),
-                new List<EMail>() { new EMail("schrutek@spengergasse.at"), new EMail("schrutek2@spengergasse.at") },
-                new EMail("schrutek@spengergasse.at")
-            );
+            Photographer newPhotographer = DatabaseUtilities.GetSeedingPhotographers()[0];
             Album newAlbum1 = new Album(
                 "Test Album 01", "Beschreibung...",
                 DateTime.Now,
@@ -42,12 +50,75 @@ public class AlbumTests : IClassFixture<DatabaseFixture>
             );
 
             // Act
-            _databaseFixture.Db.Albums.Add(newAlbum1);
-            _databaseFixture.Db.Albums.Add(newAlbum2);
-            _databaseFixture.Db.SaveChanges();
+            db.Albums.Add(newAlbum1);
+            db.Albums.Add(newAlbum2);
+            db.SaveChanges();
 
             // Assert
-            Assert.Equal(2, _databaseFixture.Db.Albums.Count());
+            Assert.Equal(2, db.Albums.Count());
+        }
+    }
+
+    [Fact]
+    public void Album_ShouldInsertValidPhotos_WhenListNotNull()
+    {
+        using (PhotoContext db = CreateDb())
+        {
+            // Arrange
+            Photographer newPhotographer = DatabaseUtilities.GetSeedingPhotographers()[0];
+            Album newAlbum = new Album(
+                "Test Album 01", "Beschreibung...",
+                DateTime.Now,
+                true,
+                newPhotographer
+            ).AddPhotos(new List<Photo>()
+            {
+                new Photo("Test Photo 01",
+                    "Beschreibung Test Photo 01...",
+                    DateTime.Now,
+                    ImageTypes.Png,
+                    new Location(12, 17),
+                    400, 800,
+                    Orientations.Landscape,
+                    false,
+                    newPhotographer),
+            });
+
+            // Act
+            db.Albums.Add(newAlbum);
+            db.SaveChanges();
+
+            // Assert
+            Assert.Equal(1, db.Albums.Count());
+            Assert.Equal(1, db.Photos.Count());
+            Assert.Single(db.Albums.First().AlbumPhotos);
+        }
+    }
+
+    [Fact]
+    public void Album_ShouldNotInsertValidPhotos_WhenListIsNull()
+    {
+        using (PhotoContext db = CreateDb())
+        {
+            // Arrange
+            Photographer newPhotographer = DatabaseUtilities.GetSeedingPhotographers()[0];
+            Album newAlbum = new Album(
+                "Test Album 01", "Beschreibung...",
+                DateTime.Now,
+                true,
+                newPhotographer
+            ).AddPhotos(
+                null!
+            );
+
+            // Act
+            db.Albums.Add(newAlbum);
+            db.SaveChanges();
+
+            // Assert
+            Assert.Equal(1, db.Albums.Count());
+            Assert.Empty(db.Photos);
+            Assert.Empty(db.Albums.First().AlbumPhotos);
         }
     }
 }
