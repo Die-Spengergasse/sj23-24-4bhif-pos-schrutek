@@ -2,7 +2,7 @@
 
 namespace Spg.AloMalo.Repository.Extensions
 {
-    public static class PhotoExtensions
+    public static class FilterPhotoExtensions
     {
         public static IPhotoRepositoryBuilder ApplyOrientationFilter(this IPhotoRepositoryBuilder builder, Orientations orientation)
         {

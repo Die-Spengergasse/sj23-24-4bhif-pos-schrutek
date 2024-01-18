@@ -22,6 +22,7 @@ namespace Spg.AloMalo.Repository.Extensions
 
         public static (PhotoContext, Photo) WithName(this (PhotoContext, Photo) input, string name)
         {
+            // Original
             (PhotoContext context, Photo photo) = input;
             photo.Name = name;
 
@@ -29,17 +30,19 @@ namespace Spg.AloMalo.Repository.Extensions
         }
         public static (PhotoContext, Photo) WithDescription(this (PhotoContext, Photo) input, string description)
         {
-            (PhotoContext context, Photo photo) = input;
+            // Vereinfacht:
+            (_, Photo photo) = input;
             photo.Description = description;
 
-            return (context, photo);
+            return input;
         }
         public static (PhotoContext, Photo) WithOrienatation(this (PhotoContext, Photo) input, Orientations orientation)
         {
-            (PhotoContext context, Photo photo) = input;
+            // Vereinfacht:
+            (_, Photo photo) = input;
             photo.Orientation = orientation;
 
-            return (context, photo);
+            return input;
         }
 
         public static PhotoContext Save(this (PhotoContext, Photo) input)

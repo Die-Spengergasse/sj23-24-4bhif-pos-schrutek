@@ -25,19 +25,20 @@ namespace Spg.AloMalo.Repository
         public IPhotoUpdateBuilder WithName(string name)
         {
             _photo.Name = name;
-            _db.Update(_photo);
+            //_db.Update(_photo);
             return this;
         }
 
         public IPhotoUpdateBuilder WithOrientation(Orientations orientation)
         {
             _photo.Orientation = orientation;
-            _db.Update(_photo);
+            //_db.Update(_photo);
             return this;
         }
 
         public int Save()
         {
+            _db.Update(_photo);
             return _db.SaveChanges();
         }
     }

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Spg.AloMalo.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class Initialisation : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -60,7 +60,7 @@ namespace Spg.AloMalo.Infrastructure.Migrations
                     Id = table.Column<int>(type: "INTEGER", nullable: false),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
                     Description = table.Column<string>(type: "TEXT", nullable: false),
-                    CreationTimeStamp = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreationTimeStamp = table.Column<DateTime>(type: "DATETIME", nullable: false),
                     Private = table.Column<bool>(type: "INTEGER", nullable: false),
                     OwnerId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
@@ -102,7 +102,7 @@ namespace Spg.AloMalo.Infrastructure.Migrations
                     Id = table.Column<int>(type: "INTEGER", nullable: false),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
                     Description = table.Column<string>(type: "TEXT", nullable: false),
-                    CreationTimeStamp = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreationTimeStamp = table.Column<DateTime>(type: "DATETIME", nullable: false),
                     ImageType = table.Column<int>(type: "INTEGER", nullable: false),
                     Location_Longitude = table.Column<double>(type: "REAL", nullable: false),
                     Location_Latitude = table.Column<double>(type: "REAL", nullable: false),

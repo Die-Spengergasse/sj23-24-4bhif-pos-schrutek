@@ -1,14 +1,14 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Spg.AloMalo.Application.Services;
+﻿using Microsoft.AspNetCore.Mvc;
+using Spg.AloMalo.DomainModel.Commands;
+using Spg.AloMalo.DomainModel.Exceptions;
+using Spg.AloMalo.DomainModel.Interfaces;
 using Spg.AloMalo.DomainModel.Model;
-using Spg.AloMalo.Repository;
 
 namespace Spg.AloMalo.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PhotoController : ControllerBase
+    public class PhotosController : ControllerBase
     {
         // GET:  Liefert alle Produkte
         // http://www.myservice.at/products
@@ -29,13 +29,35 @@ namespace Spg.AloMalo.Api.Controllers
         // GET: Liefert alle Produkte in einem Warenkorb eines Kunden
         // http://www.myservice.at/schoppingcart/[Customer-GUID]/products?.....
 
+        private readonly IPhotoService _photoService;
+
+        public PhotosController(IPhotoService photoService)
+        {
+            _photoService = photoService;
+        }
 
         [HttpGet()]
         public IActionResult GetPhoto()
         {
-            // TODO: Implementation
-            return Ok(new PhotoService()
+            var r = _photoService.GetWhatEver(new PhotoId(123), new AlbumId(456), new PhotographerId(147));
+
+            return Ok(_photoService
                 .GetPhoto());
+        }
+
+        [HttpPost()]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult CreatePhoto(CreatePhotoCommand command)
+        {
+            try
+            {
+                return Created("", _photoService.Create(command));
+            }
+            catch (PhotoServiceCreateException ex)
+            {
+                return StatusCode(500);
+            }
         }
     }
 }

@@ -11,9 +11,9 @@ namespace Spg.AloMalo.Repository
             Photos = photos;
         }
 
-        public IPhotoRepositoryBuilder ApplayNameContainsFilter(string filter)
+        public IPhotoRepositoryBuilder ApplayNameContainsFilter(string name)
         {
-            Photos = Photos.Where(x => x.Name.Contains(filter));
+            Photos = Photos.Where(x => x.Name.Contains(name));
             return this;
         }
 

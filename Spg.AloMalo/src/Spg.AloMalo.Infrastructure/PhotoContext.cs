@@ -7,6 +7,7 @@ using System.Reflection.Emit;
 namespace Spg.AloMalo.Infrastructure
 {
     // Test-Containers-Example:
+    // https://testcontainers.com/guides/testing-an-aspnet-core-web-app/
     // https://github.com/testcontainers/testcontainers-dotnet/blob/develop/examples/WeatherForecast/src/WeatherForecast/DatabaseContainer.cs
 
     // 1. Klasse vo DbContext ableiten (NuGet-Package EF Core installieren)
@@ -17,6 +18,7 @@ namespace Spg.AloMalo.Infrastructure
         public DbSet<Album> Albums => Set<Album>();
         public DbSet<Photographer> Photographers => Set<Photographer>();
         public DbSet<Person> Persons => Set<Person>();
+        public DbSet<Payment> Payments => Set<Payment>();
 
         // 3. Konstruktoren
         public PhotoContext()
@@ -107,17 +109,6 @@ namespace Spg.AloMalo.Infrastructure
                 .HasColumnName("Id")
                 .ValueGeneratedOnAdd()
                 .IsRequired();
-
-
-            //var type = converter.ModelClrType;
-            //foreach (var entityType in builder.Model.GetEntityTypes())
-            //{
-            //    // Find the properties that are our strongly-typed ID
-            //    var properties = entityType
-            //        .ClrType
-            //        .GetProperties()
-            //        .Where(p => p.PropertyType == new PersonIdValueConverter());
-            //}
         }
     }
 }
