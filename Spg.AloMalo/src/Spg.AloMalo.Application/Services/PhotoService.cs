@@ -16,17 +16,9 @@ namespace Spg.AloMalo.Application.Services
         private readonly IPhotoRepository _photoRepository;
         private readonly ILogger<PhotoService> _logger;
 
-        public PhotoService(ILogger<PhotoService> logger)
+        public PhotoService(ILogger<PhotoService> logger, IPhotoRepository photoRepository)
         {
-            DbContextOptionsBuilder dbContextOptionsBuilder = new DbContextOptionsBuilder();
-            dbContextOptionsBuilder.UseSqlite("Data Source=C:\\HTL\\Unterricht\\SJ2324\\4BHIF\\POS\\sj23-24-4bhif-pos-schrutek\\Spg.AloMalo\\Photo.db");
-
-            _dbContext = new PhotoContext(dbContextOptionsBuilder.Options);
-            _dbContext.Database.EnsureDeleted();
-            _dbContext.Database.EnsureCreated();
-            SeedHelper.Seed(_dbContext);
-
-            _photoRepository = new PhotoRepository(_dbContext);
+            _photoRepository = photoRepository;
             _logger = logger;
         }
 
@@ -39,7 +31,7 @@ namespace Spg.AloMalo.Application.Services
 
         public IQueryable<Photo> GetPhoto()
         {
-            IQueryable<Photo> result = new PhotoRepository(_dbContext)
+            IQueryable<Photo> result = _photoRepository
                 .FilterBuilder
                 .ApplyOrientationFilter(Orientations.Landscape)
                 .ApplayNameContainsFilter("My")
@@ -56,6 +48,10 @@ namespace Spg.AloMalo.Application.Services
             _logger.LogDebug("Initalisation");
 
             _logger.LogDebug("Validation");
+            if (string.IsNullOrEmpty(command.Name))
+            {
+                throw PhotoServiceValidationException.FromLastNameRequired();
+            }
 
             _logger.LogDebug("Action");
 
@@ -71,22 +67,23 @@ namespace Spg.AloMalo.Application.Services
                 throw PhotoServiceCreateException.FromSave();
             }
 
-            return null;   
+            return null!;
         }
 
         public void Update(Photo photo)
         {
+            // Bad!
             // photos.Update(string name, string description, bool ai, int width, int height, ...)
             // photos.Update(string name)
             // photos.Update(int width, int height, ...)
             // Put, Patch
 
+            // Better!
             // mit Repository-Pattern
             _photoRepository
                 .UpdatePhoto(GetPhoto().First())
                 .WithOrientation(Orientations.Portrait)
                 .Save();
-
             // ohne Repository-Pattern
             _dbContext
                 .UpdatePhoto(GetPhoto().First())

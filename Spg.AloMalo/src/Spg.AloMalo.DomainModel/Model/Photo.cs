@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Spg.AloMalo.DomainModel.Model
@@ -20,9 +21,11 @@ namespace Spg.AloMalo.DomainModel.Model
         public Orientations Orientation { get; set; }
         public bool AiGenerated { get; private set; }
 
+        [JsonIgnore()]
         public Photographer? PhotographerNavigation { get; set; }
 
         private List<AlbumPhoto> _albumPhotos = new();
+        [JsonIgnore()]
         public IReadOnlyList<AlbumPhoto> AlbumPhotos => _albumPhotos;
 
         protected Photo()

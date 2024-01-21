@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
 using Spg.AloMalo.DomainModel.Commands;
 using Spg.AloMalo.DomainModel.Exceptions;
 using Spg.AloMalo.DomainModel.Interfaces;
@@ -39,10 +40,11 @@ namespace Spg.AloMalo.Api.Controllers
         [HttpGet()]
         public IActionResult GetPhoto()
         {
+            // Deswegen Rich Typed IDs
             var r = _photoService.GetWhatEver(new PhotoId(123), new AlbumId(456), new PhotographerId(147));
 
-            return Ok(_photoService
-                .GetPhoto());
+            // bloß Daten holen...
+            return Ok(_photoService.GetPhoto());
         }
 
         [HttpPost()]
@@ -50,14 +52,22 @@ namespace Spg.AloMalo.Api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult CreatePhoto(CreatePhotoCommand command)
         {
+            // Try-Catch-Blöcke im Controller sind richtig HÄSSLICH!
+            // (Lösung im AlbumController)
             try
             {
                 return Created("", _photoService.Create(command));
             }
-            catch (PhotoServiceCreateException ex)
+            catch (PhotoServiceCreateException)
             {
-                return StatusCode(500);
+                return NotFound();
             }
+            catch (PhotoServiceValidationException)
+            {
+                return BadRequest();
+            }
+            // catch (...)
+            // ...
         }
     }
 }

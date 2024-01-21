@@ -1,4 +1,5 @@
-﻿using Spg.AloMalo.DomainModel.Model;
+﻿using Microsoft.EntityFrameworkCore;
+using Spg.AloMalo.DomainModel.Model;
 using Spg.AloMalo.Infrastructure;
 using System;
 using System.Collections.Generic;
@@ -6,11 +7,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Spg.AloMalo.Application.Services
+namespace Spg.AloMalo.DomainModel.Test
 {
-    public static class SeedHelper
+    public class DatabaseTests
     {
-        public static void Seed(PhotoContext db)
+        private PhotoContext CreateDb()
+        {
+            DbContextOptionsBuilder dbContextOptionsBuilder = new DbContextOptionsBuilder();
+            dbContextOptionsBuilder.UseSqlite("Data Source=.\\..\\..\\..\\..\\..\\Photo.db");
+
+            PhotoContext db= new PhotoContext(dbContextOptionsBuilder.Options);
+            db.Database.EnsureDeleted();
+            db.Database.EnsureCreated();
+
+            return db;
+        }
+
+        private void SeedDb(PhotoContext db)
         {
             Photographer newPhotographer = new Photographer(
                 "Martin",
@@ -92,6 +105,17 @@ namespace Spg.AloMalo.Application.Services
             db.Photos.Add(newPhoto4);
             db.Photos.Add(newPhoto5);
             db.SaveChanges();
+        }
+
+        [Fact()]
+        public void Db_Should_Create()
+        {
+            using (PhotoContext db = CreateDb())
+            {
+                db.Database.EnsureDeleted();
+                db.Database.EnsureCreated();
+                SeedDb(db);
+            }
         }
     }
 }

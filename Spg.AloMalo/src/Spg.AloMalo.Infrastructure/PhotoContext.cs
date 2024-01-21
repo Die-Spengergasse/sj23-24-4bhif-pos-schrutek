@@ -33,7 +33,7 @@ namespace Spg.AloMalo.Infrastructure
 
             if (!builder.IsConfigured)
             {
-                builder.UseSqlServer("Server=localhost\\sqlexpress;Database=PhotoDb;Integrated Security=true;MultipleActiveResultSets=True;Encrypt=False;");
+                //builder.UseSqlServer("Server=localhost\\sqlexpress;Database=PhotoDb;Integrated Security=true;MultipleActiveResultSets=True;Encrypt=False;");
                 //builder.UseSqlite("Data Source=C:\\HTL\\Unterricht\\SJ2324\\4BHIF\\POS\\sj23-24-4bhif-pos-schrutek\\Spg.AloMalo\\Photo.db");
             }
         }
